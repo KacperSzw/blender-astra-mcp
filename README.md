@@ -17,7 +17,8 @@ Blender API, while keeping four MCP tools and on-demand operation discovery.
   response; `bpy`, `params` and `output_dir` are available in the script.
 - Camera or interactive viewport previews; `render` uses current scene resolution and supports animation.
 - Independent write/render/delete/save toggles and an additional Python toggle, fixed at bridge start.
-  **Python is unrestricted local code execution and can bypass all the narrower toggles.** It defaults off.
+  **Python is unrestricted local code execution and can bypass all the narrower toggles.** All permissions
+  default on in this workstation-oriented fork.
 - Interactive undo checkpoints and explicit partial batch errors. Long operations block Blender;
   the MCP execute timeout is configurable and does not cancel work.
 
@@ -26,28 +27,32 @@ The historical benchmark below measures batching only; no cross-product token co
 
 ## Quick start
 
-Requirements: Blender, Python 3.11+ and [uv](https://docs.astral.sh/uv/).
+Requirements: Blender 4.2+ and Nix on x86_64-linux.
 
-1. Download `compact_blender-0.2.0.zip` from this repository's Releases.
-2. In Blender, open **Edit → Preferences → Add-ons → Install from Disk**, choose the ZIP and enable
+1. Build the bridge and add-on bundle:
+
+```sh
+nix build .#blender-compact-mcp
+nix build .#addon
+```
+
+2. In Blender, open **Edit → Preferences → Add-ons → Install from Disk**, choose
+   `result/compact_blender-0.2.0.zip`, and enable
    **Compact Blender MCP**.
 3. In the 3D Viewport sidebar (`N`), open **Compact MCP**. Review permissions and click **Start bridge**.
-   Write and render default on; delete, save and Python default off. Enable Python for full API access. Stop/restart to change permissions.
-4. Clone this repository and run `uv sync --frozen` inside it.
-5. Add the MCP command below to your client. Use an absolute path to your checkout:
+   All five permissions default on. Stop/restart to change them.
+4. Add the absolute path to the Nix-built `blender-compact-mcp` command to your MCP client:
 
 ```json
 {
   "mcpServers": {
     "blender-compact": {
-      "command": "uv",
-      "args": ["run", "--directory", "/absolute/path/blender-compact-mcp", "blender-compact-mcp"]
+      "command": "/nix/store/.../bin/blender-compact-mcp"
     }
   }
 }
 ```
 
-If `uv` is not on the GUI application's PATH, set `command` to its absolute executable path.
 Use the client's own MCP configuration format; the block above illustrates a common JSON form.
 No token needs to be pasted into model context. The bridge reads the local descriptor.
 
@@ -67,22 +72,22 @@ First ask the agent to discover `primitive`, `array`, `material`, and `assign_ma
 Or use the CLI:
 
 ```sh
-uv run blender-compact discover
-uv run blender-compact inspect
-uv run blender-compact execute --params '{"steps":[{"op":"primitive","kind":"cube","name":"Demo","location":[0,0,1]},{"op":"array","name":"Demo","count":49,"offset":[2.5,0,0],"prefix":"Copy"}]}'
+blender-compact discover
+blender-compact inspect
+blender-compact execute --params '{"steps":[{"op":"primitive","kind":"cube","name":"Demo","location":[0,0,1]},{"op":"array","name":"Demo","count":49,"offset":[2.5,0,0],"prefix":"Copy"}]}'
 ```
 
 For PowerShell, avoid nested JSON quoting by piping a file:
 
 ```powershell
-Get-Content -Raw examples/scene.json | uv run blender-compact execute --params -
+Get-Content -Raw examples/scene.json | blender-compact execute --params -
 ```
 
 That example creates 50 cubes, a floor, camera and lights in one batch. Names must be unique;
 it intentionally refuses to overwrite existing objects. Run it in a fresh scene.
 
 ```sh
-uv run blender-compact capture --params '{"filename":"preview.png","size":768}'
+blender-compact capture --params '{"filename":"preview.png","size":768}'
 ```
 
 The CLI returns an output filename; MCP returns an image. Exports go under the local state
@@ -120,27 +125,18 @@ See [design](docs/design.md) and [security](SECURITY.md).
 ## Development and tests
 
 ```sh
-uv sync --frozen
-uv run ruff check --config pyproject.toml .
-uv run ruff format --check --config pyproject.toml .
-uv run pytest -q
-uv run python scripts/package_addon.py
-uv build
+nix flake check
+nix build .#blender-compact-mcp
+nix build .#addon
 ```
 
-Without `BLENDER_EXE`, real Blender tests explicitly skip. Enable them on Windows:
+Blender-dependent integration tests are skipped by the Nix check because they must launch a separate
+factory-startup Blender process. They never connect to an already-open user scene or save user
+preferences. Outputs and logs go to ignored `artifacts/`; the shared NixOS setup validates the live
+bridge separately with `blender-compact discover` and `blender-compact inspect`.
 
-```powershell
-$env:BLENDER_EXE = 'D:/blender/blender.exe' # use your installed path
-$env:BLENDER_TEST_UI = '1' # also check actual UI timer execution and Undo
-uv run pytest -q
-```
-
-The tests launch **separate factory-startup processes**. They never connect to an already-open user
-scene or save user preferences. Outputs and logs go to ignored `artifacts/`. The UI helper is hidden
-on Windows and exits automatically. Linux UI tests require a display; background tests do not.
-
-The package ZIP contains only the add-on's Python sources. The wheel contains the MCP bridge/CLI;
-installing the wheel alone does not install the Blender add-on.
+The `blender-compact-mcp` package contains the MCP bridge/CLI and the add-on source. The separate
+`addon` output contains the installable Blender ZIP and its SHA256 checksum. This fork follows
+commit-pinned main snapshots rather than publishing PyPI packages or formal GitHub releases.
 
 MIT licensed. Independent software, not affiliated with Blender or any model provider.

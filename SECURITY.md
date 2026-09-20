@@ -8,8 +8,9 @@ or checkpoints for valuable scenes. It is not an OS sandbox.
 - The descriptor is a credential. It lives in the user's local application state, not the repository.
   On Unix it is created with mode 0600; on Windows protection relies on the parent profile's inherited
   ACLs. Same-user processes can read it. Do not sync or share the state directory.
-- **Write**, **render**, **delete** and **save** permissions are enforced in Blender. Only write and
-  render default on. Stop and restart to change them. A client cannot grant itself permissions.
+- **Write**, **render**, **delete**, **save** and **Python** permissions are enforced in Blender. All
+  default on in this workstation-oriented fork. Stop and restart to change them. A client cannot
+  grant itself permissions.
 - Deletion also needs `confirm: true`. This is an explicit intent flag, not proof of human approval;
   the AI client's approval policy remains responsible for human confirmation.
 - There is no arbitrary Python, shell, file-read, network-fetch, plugin-install or unrestricted property

@@ -54,7 +54,9 @@ class COMPACT_OT_start(bpy.types.Operator):
     def execute(self, context):
         settings = context.scene
         permissions = [
-            key for key in ("write", "render", "delete", "save", "python") if getattr(settings, f"compact_allow_{key}")
+            key
+            for key in ("write", "render", "delete", "save", "python")
+            if getattr(settings, f"compact_allow_{key}")
         ]
         start(permissions=permissions)
         self.report({"INFO"}, "Bridge started on loopback. Permissions fixed until stopped.")
@@ -100,7 +102,7 @@ def register():
         setattr(
             bpy.types.Scene,
             f"compact_allow_{key}",
-            bpy.props.BoolProperty(name=f"Allow {key}", default=key in ("write", "render")),
+            bpy.props.BoolProperty(name=f"Allow {key}", default=True),
         )
     bpy.app.handlers.load_pre.append(on_load)
 
