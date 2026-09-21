@@ -2,12 +2,14 @@
 
 import math
 import re
+from fnmatch import fnmatchcase
 from pathlib import Path
 
 import bpy
 from mathutils import Vector
 
 from .catalog import CATALOG, PERMISSIONS, discover
+from .snippets import OutputBudget, Snippets, run_python
 
 OWNER = "blender_compact_mcp"
 
@@ -58,32 +60,23 @@ def validate_step(step):
     if not isinstance(step, dict):
         raise ValueError("Each step must be an object")
     op = step.get("op")
-    if op not in CATALOG:
-        raise ValueError(f"Unknown operation: {op}")
+    if not isinstance(op, str) or op not in CATALOG:
+        raise ValueError(f"Unknown operation: {op}; discover lists operations")
     extra = set(step) - {"op"} - set(CATALOG[op]["args"])
     if extra:
-        raise ValueError(f"Unknown arguments: {sorted(extra)}")
+        raise ValueError(
+            f"Unknown arguments for {op}: {sorted(extra)}; allowed: {','.join(CATALOG[op]['args'])}"
+        )
+    for key in CATALOG[op]["required"]:
+        if key not in step:
+            raise ValueError(f"{op} needs {key}")
+    for key in ("name", "prefix", "material", "modifier", "data_path"):
+        if key in step:
+            name(step[key])
     from .extended import validate
 
     if validate(op, step):
         return
-    required = {
-        "primitive": ["name", "kind"],
-        "transform": ["name"],
-        "material": ["name", "color"],
-        "assign_material": ["name", "material"],
-        "array": ["name", "count", "offset", "prefix"],
-        "light": ["name", "location", "energy"],
-        "camera": ["name", "location", "target"],
-        "delete": ["names", "confirm"],
-        "save": ["filename"],
-    }
-    for key in required[op]:
-        if key not in step:
-            raise ValueError(f"{op} needs {key}")
-    for key in ("name", "prefix", "material"):
-        if key in step:
-            name(step[key])
     for key in ("location", "rotation", "scale", "offset", "target"):
         if key in step:
             vector(step[key])
@@ -118,6 +111,7 @@ class Engine:
     def __init__(self, output_dir, permissions=("write", "render")):
         self.output_dir = Path(output_dir)
         self.permissions = set(permissions)
+        self.snippets = Snippets()
 
     def collection(self):
         scene = bpy.context.scene
@@ -136,7 +130,10 @@ class Engine:
         self.collection().objects.link(obj)
         return obj
 
-    def inspect(self, names=None, limit=20, offset=0):
+    def inspect(self, names=None, limit=20, offset=0, match=None, fields=None, context=False):
+        # Rust projects optional context into MCP text; CLI JSON keeps its metadata.
+        if type(context) is not bool:
+            raise ValueError("context must be boolean")
         if type(limit) is not int or not 1 <= limit <= 100 or type(offset) is not int or offset < 0:
             raise ValueError("limit must be 1..100 and offset nonnegative")
         if names is not None and (not isinstance(names, list) or len(names) > 100):
@@ -144,28 +141,59 @@ class Engine:
         if names is not None:
             for value in names:
                 name(value)
+        if names is not None and match is not None:
+            raise ValueError("names and match are mutually exclusive")
+        if match is not None:
+            name(match)
+        available = (
+            "name",
+            "type",
+            "managed",
+            "location",
+            "scale",
+            "rotation",
+            "vertices",
+            "polygons",
+            "materials",
+        )
+        if fields is not None and (
+            not isinstance(fields, list)
+            or len(fields) > len(available)
+            or any(not isinstance(f, str) or f not in available for f in fields)
+        ):
+            raise ValueError(f"fields must select from {','.join(available)}")
+        selected = set(fields if fields is not None else available if names is not None else available[:4])
         scene = bpy.context.scene
-        objects = sorted((o for o in scene.objects if names is None or o.name in names), key=lambda o: o.name)
+        candidates = (
+            (scene.objects.get(n) for n in dict.fromkeys(names)) if names is not None else scene.objects
+        )
+        objects = sorted(
+            (o for o in candidates if o is not None and (match is None or fnmatchcase(o.name, match))),
+            key=lambda o: o.name,
+        )
         rows = []
         for obj in objects[offset : offset + limit]:
-            row = {
-                "name": obj.name,
-                "type": obj.type,
-                "managed": obj.get(OWNER) is True,
-                "location": [round(v, 4) for v in obj.location],
-            }
-            if names is not None:
-                row.update(
-                    scale=[round(v, 4) for v in obj.scale], rotation=[round(v, 4) for v in obj.rotation_euler]
-                )
-                if obj.type == "MESH":
-                    row.update(
-                        vertices=len(obj.data.vertices),
-                        polygons=len(obj.data.polygons),
-                        materials=[m.name if m else None for m in obj.data.materials],
-                    )
+            row = {"name": obj.name}
+            if "type" in selected:
+                row["type"] = obj.type
+            if "managed" in selected:
+                row["managed"] = obj.get(OWNER) is True
+            for field, attribute in (
+                ("location", "location"),
+                ("scale", "scale"),
+                ("rotation", "rotation_euler"),
+            ):
+                if field in selected:
+                    row[field] = [round(v, 4) for v in getattr(obj, attribute)]
+            if obj.type == "MESH":
+                if "vertices" in selected:
+                    row["vertices"] = len(obj.data.vertices)
+                if "polygons" in selected:
+                    row["polygons"] = len(obj.data.polygons)
+                if "materials" in selected:
+                    row["materials"] = [m.name if m else None for m in obj.data.materials]
             rows.append(row)
-        return {
+        result = {
             "blender": bpy.app.version_string,
             "scene": scene.name,
             "permissions": sorted(self.permissions),
@@ -173,6 +201,11 @@ class Engine:
             "objects": rows,
             "next_offset": offset + limit if offset + limit < len(objects) else None,
         }
+        if names is not None:
+            missing = [n for n in dict.fromkeys(names) if scene.objects.get(n) is None]
+            if missing:
+                result["missing"] = missing
+        return result
 
     def execute(self, steps, dry_run=False):
         if not isinstance(steps, list) or not 1 <= len(steps) <= 100:
@@ -181,10 +214,12 @@ class Engine:
             raise ValueError("dry_run must be boolean")
         # Validate syntax and permissions for the entire batch before any writes.
         # Existence checks remain per-operation to permit references to earlier creations.
+        prepared = []
         for step in steps:
             validate_step(step)
             if PERMISSIONS[step["op"]] is not None and PERMISSIONS[step["op"]] not in self.permissions:
                 raise PermissionError(f"Disabled permission: {PERMISSIONS[step['op']]}")
+            prepared.append(self.snippets.prepare(step) if step["op"] == "python" else None)
         if sum(s.get("count", 1) for s in steps) > 500:
             raise ValueError("Batch expands to more than 500 operations")
         if bpy.context.mode != "OBJECT" and any(s["op"] not in ("python", "frame", "rna") for s in steps):
@@ -197,37 +232,45 @@ class Engine:
         if can_undo:
             bpy.ops.ed.undo_push(message="Before Compact MCP batch")
         try:
-            return self.run_steps(steps)
+            return self.run_steps(steps, prepared)
         finally:
             if can_undo:
                 bpy.ops.ed.undo_push(message="Compact MCP batch")
 
-    def run_steps(self, steps):
-        completed = 0
-        changed = 0
-        results = []
+    def run_steps(self, steps, prepared):
+        response = {"ok": True, "completed": 0, "changed": 0, "files": []}
+        values = []
+        budget = OutputBudget()
         for index, step in enumerate(steps):
             try:
+                if step["op"] == "python":
+                    code, handle = self.snippets.activate(prepared[index])
+                    item = {"index": index, "result": {"script": handle}}
+                    values.append(item)
+                    response["changed"] = None
+                    payload, error = run_python(self, step, code, budget)
+                    item["result"].update(payload)
+                    if error is not None:
+                        raise RuntimeError(error)
+                    response["completed"] += 1
+                    continue
                 result = self.step(step)
-                changed += result.get("changed", 0)
+                if response["changed"] is not None:
+                    response["changed"] += result.get("changed", 0)
                 if "file" in result:
-                    results.append(result)
+                    response["files"].append(result)
                 if "result" in result:
-                    results.append({"index": index, "result": result["result"]})
-                completed += 1
+                    values.append({"index": index, "result": result["result"]})
+                response["completed"] += 1
             except Exception as exc:
-                return {
-                    "ok": False,
-                    "completed": completed,
-                    "failed_index": index,
-                    "error": str(exc),
-                    "changed": changed,
-                    "atomic": False,
-                    "note": "Earlier operations persist; failed operation may have partial effects.",
-                }
-        files = [r for r in results if "file" in r]
-        response = {"ok": True, "completed": completed, "changed": changed, "files": files}
-        values = [r for r in results if "result" in r]
+                response.update(
+                    ok=False,
+                    failed_index=index,
+                    error=str(exc)[:2048],
+                    atomic=False,
+                    note="Earlier operations persist; failed operation may have partial effects.",
+                )
+                break
         if values:
             response["results"] = values
         return response
@@ -377,6 +420,21 @@ class Engine:
         if method == "inspect":
             return self.inspect(**params)
         if method == "execute":
+            extra = set(params) - {"code", "script", "params", "max_output", "steps", "dry_run"}
+            if extra:
+                raise ValueError(f"Unknown execute arguments: {sorted(extra)}")
+            if sum(key in params for key in ("code", "script", "steps")) != 1:
+                raise ValueError("Exactly one of code, script, steps is required")
+            if "steps" in params:
+                if "params" in params or "max_output" in params:
+                    raise ValueError("params/max_output belong inside each Python step when using steps")
+            else:
+                params = params.copy()
+                step = {"op": "python"}
+                for key in ("code", "script", "params", "max_output"):
+                    if key in params:
+                        step[key] = params.pop(key)
+                params["steps"] = [step]
             return self.execute(**params)
         if method == "capture":
             return self.capture(**params)

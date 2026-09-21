@@ -1,24 +1,41 @@
 { pkgs, src }:
-
-pkgs.python3Packages.buildPythonApplication rec {
+let
+  projectSource = src;
+in
+pkgs.rustPlatform.buildRustPackage rec {
   pname = "blender-compact-mcp";
-  version = "0.2.0";
-  pyproject = true;
+  version = (builtins.fromTOML (builtins.readFile ../Cargo.toml)).package.version;
 
-  inherit src;
+  src = pkgs.lib.fileset.toSource {
+    root = projectSource;
+    fileset = pkgs.lib.fileset.unions [
+      (projectSource + "/Cargo.toml")
+      (projectSource + "/Cargo.lock")
+      (pkgs.lib.fileset.fileFilter (file: file.hasExt "rs") (projectSource + "/src"))
+      (pkgs.lib.fileset.fileFilter (file: file.hasExt "py") (projectSource + "/addon"))
+      (pkgs.lib.fileset.fileFilter (file: file.hasExt "rs" || file.hasExt "json") (
+        projectSource + "/tests"
+      ))
+      (pkgs.lib.fileset.fileFilter (file: file.hasExt "py") (projectSource + "/scripts"))
+    ];
+  };
+  cargoLock.lockFile = ../Cargo.lock;
 
-  nativeBuildInputs = [ pkgs.python3Packages.hatchling ];
-  dependencies = [ pkgs.python3Packages.mcp ];
+  nativeCheckInputs = [
+    pkgs.blender
+    pkgs.rustfmt
+    pkgs.clippy
+  ];
+  preCheck = ''
+    export BLENDER_EXE="${pkgs.blender}/bin/blender"
+    cargo fmt --check
+    cargo clippy --locked --all-targets -- -D warnings
+  '';
 
   postInstall = ''
     mkdir -p "$out/share/blender-addons"
     cp -r addon/compact_blender "$out/share/blender-addons/"
   '';
-
-  pythonImportsCheck = [
-    "compact_mcp.cli"
-    "compact_mcp.server"
-  ];
 
   meta = {
     description = "Four-tool Blender MCP bridge with batched operations";

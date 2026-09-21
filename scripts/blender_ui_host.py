@@ -12,7 +12,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "addon"))
 import compact_blender  # noqa: E402
 
 compact_blender.register()
-compact_blender.start(folder / "exports", folder / "connection.json")
+compact_blender.start(folder / "exports", folder / "connection.json", ("write", "render", "python"))
 deadline = time.monotonic() + 90
 
 
@@ -30,6 +30,7 @@ def lifecycle():
         (folder / "ui-result.json").write_text(json.dumps(result))
     if (folder / "stop").exists() or time.monotonic() > deadline:
         compact_blender.unregister()
+        (folder / "stopped").touch()
         bpy.ops.wm.quit_blender()
         return None
     return 0.1

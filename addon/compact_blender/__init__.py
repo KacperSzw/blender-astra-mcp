@@ -9,7 +9,7 @@ from .transport import Server, state_dir
 bl_info = {
     "name": "Compact Blender MCP",
     "author": "Mohak Malviya",
-    "version": (0, 2, 0),
+    "version": (0, 4, 0),
     "blender": (4, 2, 0),
     "location": "View3D > Sidebar > Compact MCP",
     "description": "Batched Blender operations through four compact MCP tools",

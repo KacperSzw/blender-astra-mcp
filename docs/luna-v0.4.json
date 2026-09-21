@@ -1,0 +1,572 @@
+{
+  "date": "2026-09-21",
+  "initial_guidance": {
+    "instructions": "Use loops and return only needed data. Discover unfamiliar operations. Python is unrestricted. Partial changes persist; timeouts do not cancel work. Inspect before retrying.",
+    "inspect": "Read objects. Use names or match (case-sensitive glob); fields selects properties."
+  },
+  "final_schema": {
+    "instructions": "Use loops and return only needed data. Discover unfamiliar operations. Python is unrestricted. Failed steps may leave changes; timeouts do not cancel work. Inspect before retrying.",
+    "tools": [
+      {
+        "name": "inspect",
+        "description": "names or case-sensitive match glob; fields selects properties. Follow next_offset until absent; keep scene unchanged.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "names": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "maxItems": 100
+            },
+            "match": {
+              "type": "string"
+            },
+            "fields": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "name,type,managed,location,rotation,scale,vertices,polygons,materials"
+            },
+            "limit": {
+              "type": "integer",
+              "default": 20,
+              "minimum": 1,
+              "maximum": 100
+            },
+            "offset": {
+              "type": "integer",
+              "default": 0,
+              "minimum": 0
+            },
+            "context": {
+              "type": "boolean",
+              "description": "Include Blender version and permissions."
+            }
+          },
+          "additionalProperties": false
+        },
+        "annotations": {
+          "readOnlyHint": true,
+          "openWorldHint": false
+        }
+      },
+      {
+        "name": "discover",
+        "description": "List operations or get contracts by name/list; ? means optional.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "operation": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "minItems": 1,
+                  "maxItems": 16
+                }
+              ]
+            }
+          },
+          "additionalProperties": false
+        },
+        "annotations": {
+          "readOnlyHint": true,
+          "openWorldHint": false
+        }
+      },
+      {
+        "name": "execute",
+        "description": "Exactly one of code, script, steps. Module-level Python: assign result only if needed; no top-level return. dry_run checks syntax/permissions only.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "code": {
+              "type": "string",
+              "description": "Globals: bpy, params, output_dir."
+            },
+            "script": {
+              "type": "string",
+              "description": "Reuse a returned session handle."
+            },
+            "params": {
+              "type": "object"
+            },
+            "max_output": {
+              "type": "integer",
+              "default": 2000,
+              "minimum": 0,
+              "maximum": 32000
+            },
+            "steps": {
+              "type": "array",
+              "description": "Batch {op,...args}.",
+              "items": {
+                "type": "object"
+              },
+              "minItems": 1,
+              "maxItems": 100
+            },
+            "dry_run": {
+              "type": "boolean",
+              "default": false
+            },
+            "timeout": {
+              "type": "integer",
+              "default": 180,
+              "minimum": 1,
+              "maximum": 86400
+            }
+          },
+          "additionalProperties": false
+        }
+      },
+      {
+        "name": "capture",
+        "description": "Camera render or interactive viewport PNG.",
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "size": {
+              "type": "integer",
+              "default": 512,
+              "minimum": 64,
+              "maximum": 1024
+            },
+            "view": {
+              "type": "string",
+              "enum": [
+                "camera",
+                "viewport"
+              ],
+              "default": "camera"
+            }
+          },
+          "additionalProperties": false
+        },
+        "annotations": {
+          "destructiveHint": false,
+          "openWorldHint": false
+        }
+      }
+    ]
+  },
+  "initial_call_answers": {
+    "calls": [
+      {
+        "case": "current scene frame",
+        "tool": "execute",
+        "arguments": {
+          "code": "result = bpy.context.scene.frame_current"
+        }
+      },
+      {
+        "case": "move existing benches",
+        "tool": "execute",
+        "arguments": {
+          "code": "for i in range(20):\n    bpy.data.objects[f'Bench_{i:03d}'].location = (i, 0, 2)"
+        }
+      },
+      {
+        "case": "execute returned handle",
+        "tool": "execute",
+        "arguments": {
+          "script": "39240c4c00001ed0:1",
+          "params": {
+            "names": [
+              "Door West"
+            ],
+            "z": 9
+          }
+        }
+      },
+      {
+        "case": "discover primitive and array contracts",
+        "tool": "discover",
+        "arguments": {
+          "operation": [
+            "primitive_add",
+            "array"
+          ]
+        }
+      },
+      {
+        "case": "validate set frame code",
+        "tool": "execute",
+        "arguments": {
+          "code": "bpy.context.scene.frame_set(18)",
+          "dry_run": true
+        }
+      }
+    ]
+  },
+  "initial_readability_answers": {
+    "interpretations": {
+      "A": "No. An ok response from a cached script with no requested return data confirms successful execution only; it does not provide a mutation count.",
+      "B": "Yes. The step at index 0 completed and its changes can remain, while the step at index 1 failed and made no successful change. Do not retry automatically: inspect the scene first, then retry only the failed or otherwise necessary work deliberately.",
+      "C": "Syntax and permission validation succeeded, and zero operations were executed. Runtime behavior, mutations, and runtime errors remain unknown until execution is actually performed.",
+      "D": {
+        "records": [
+          {
+            "name": "Cube",
+            "count": 9007199254740993,
+            "value": false
+          },
+          {
+            "name": "001",
+            "count": 18446744073709551615,
+            "value": null
+          }
+        ],
+        "note": "Preserve each field's JSON type and the count lexemes exactly; consumers must not coerce these counts through an imprecise floating-point representation."
+      },
+      "E": "Continue inspection with offset=2, keeping the same requested fields and limit. Repeat with offset increased by the number returned (or by the page limit when that is the returned page size) until offset >= total or a page returns fewer records than requested; then stop.",
+      "F": "A reuse response omitting script= means the previously returned session script handle was reused and is not repeated. A new-source response includes script= because it creates and returns a new session handle for later reuse."
+    },
+    "repairs": [
+      {
+        "case": 1,
+        "tool": "execute",
+        "arguments": {
+          "code": "result = bpy.context.scene.frame_current"
+        }
+      },
+      {
+        "case": 2,
+        "tool": "execute",
+        "arguments": {
+          "steps": [
+            {
+              "op": "primitive",
+              "name": "SmokeSeed",
+              "kind": "cube"
+            },
+            {
+              "op": "array",
+              "name": "SmokeSeed",
+              "count": 3,
+              "offset": [
+                2,
+                0,
+                0
+              ],
+              "prefix": "SmokeCopy"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "discovery_recovery": {
+    "calls": [
+      {
+        "tool": "discover",
+        "arguments": {}
+      },
+      {
+        "tool": "discover",
+        "arguments": {
+          "operation": [
+            "primitive",
+            "array"
+          ]
+        }
+      }
+    ]
+  },
+  "fresh_guidance_answers": {
+    "pagination": {
+      "next_call": {
+        "tool": "inspect",
+        "arguments": {
+          "match": "Bench_*",
+          "fields": [
+            "location"
+          ],
+          "limit": 20,
+          "offset": 2
+        }
+      },
+      "interpretation": "Inspection is not complete because next_offset=2 is present. Continue with the next call and stop only when the response omits next_offset; the scene must remain Scene and unchanged while paging (if the scene changes, restart inspection for the new scene)."
+    },
+    "failure": "The first step completed and may have side effects. The failed step may also have partial side effects because failed steps can leave changes. The exact final state cannot be inferred from this response, so automatic retry is inappropriate; inspect the state first and retry only what is still needed.",
+    "edit": {
+      "tool": "execute",
+      "arguments": {
+        "code": "bpy.data.objects[\"Cube\"].location = (1, 2, 3)"
+      }
+    }
+  },
+  "runtime_replay": {
+    "model": "gpt-5.6-luna",
+    "method": "Prompt-only candidate calls replayed through actual MCP stdio in isolated Blender; not a native function-calling or statistical accuracy evaluation",
+    "fixture": "Created twenty Bench objects, Cube, and Door West; rebound the supplied example handle to equivalent fixture code. Includes the two failure fixtures specified for the repair trial; setup/verification calls and model reasoning excluded from payload counts.",
+    "calls": [
+      {
+        "case": "current scene frame",
+        "name": "execute",
+        "arguments": {
+          "code": "result = bpy.context.scene.frame_current"
+        },
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "ok\nscript=932f54ed2e97db04:3\nresult: 1"
+            }
+          ],
+          "isError": false
+        }
+      },
+      {
+        "case": "move existing benches",
+        "name": "execute",
+        "arguments": {
+          "code": "for i in range(20):\n    bpy.data.objects[f'Bench_{i:03d}'].location = (i, 0, 2)"
+        },
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "ok\nscript=932f54ed2e97db04:4"
+            }
+          ],
+          "isError": false
+        }
+      },
+      {
+        "case": "execute returned handle",
+        "name": "execute",
+        "arguments": {
+          "script": "932f54ed2e97db04:2",
+          "params": {
+            "names": [
+              "Door West"
+            ],
+            "z": 9
+          }
+        },
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "ok"
+            }
+          ],
+          "isError": false
+        }
+      },
+      {
+        "case": "discover primitive and array contracts",
+        "name": "discover",
+        "arguments": {
+          "operation": [
+            "primitive_add",
+            "array"
+          ]
+        },
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "error: operation must contain 1..16 known names; omit operation to list names"
+            }
+          ],
+          "isError": true
+        }
+      },
+      {
+        "case": "validate set frame code",
+        "name": "execute",
+        "arguments": {
+          "code": "bpy.context.scene.frame_set(18)",
+          "dry_run": true
+        },
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "validated=1 executed=0 scope=syntax/permissions"
+            }
+          ],
+          "isError": false
+        }
+      },
+      {
+        "case": "specified top-level return failure",
+        "origin": "Failure fixture specified in the readability prompt, not generated by this agent",
+        "name": "execute",
+        "arguments": {
+          "code": "return bpy.context.scene.frame_current"
+        },
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "error: Module-level Python: assign result instead of top-level return"
+            }
+          ],
+          "isError": true
+        }
+      },
+      {
+        "case": "specified primitive/array field failure",
+        "origin": "Failure fixture specified in the readability prompt, not generated by this agent",
+        "name": "execute",
+        "arguments": {
+          "steps": [
+            {
+              "op": "primitive",
+              "name": "SmokeSeed",
+              "mesh": {
+                "kind": "cube"
+              }
+            },
+            {
+              "op": "array",
+              "source": "SmokeSeed",
+              "count": 3,
+              "offset": [
+                2,
+                0,
+                0
+              ],
+              "prefix": "SmokeCopy"
+            }
+          ]
+        },
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "error: Unknown arguments for primitive: ['mesh']; allowed: name,kind,location,scale"
+            }
+          ],
+          "isError": true
+        }
+      },
+      {
+        "case": "readability repair 1",
+        "name": "execute",
+        "arguments": {
+          "code": "result = bpy.context.scene.frame_current"
+        },
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "ok\nscript=932f54ed2e97db04:6\nresult: 1"
+            }
+          ],
+          "isError": false
+        }
+      },
+      {
+        "case": "readability repair 2",
+        "name": "execute",
+        "arguments": {
+          "steps": [
+            {
+              "op": "primitive",
+              "name": "SmokeSeed",
+              "kind": "cube"
+            },
+            {
+              "op": "array",
+              "name": "SmokeSeed",
+              "count": 3,
+              "offset": [
+                2,
+                0,
+                0
+              ],
+              "prefix": "SmokeCopy"
+            }
+          ]
+        },
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "ok"
+            }
+          ],
+          "isError": false
+        }
+      },
+      {
+        "case": "fresh guidance no-data edit",
+        "name": "execute",
+        "arguments": {
+          "code": "bpy.data.objects[\"Cube\"].location = (1, 2, 3)"
+        },
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "ok\nscript=932f54ed2e97db04:7"
+            }
+          ],
+          "isError": false
+        }
+      },
+      {
+        "case": "discovery repair",
+        "name": "discover",
+        "arguments": {},
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "primitive: Create a mesh\ntransform: Transform one object\nmaterial: Create/update a Principled material\nassign_material: Replace a mesh's material slots\narray: Create linked copies along an offset in ONE operation\nlight: Create light\ncamera: Create camera and make it active\ndelete: Delete active-scene objects; requires delete permission AND confirm\nsave: Save a copy under the configured output directory; existing files refused\npython: Full bpy/Python API: nodes, rigs, simulation, files, operators; unrestricted local code\nmodifier: Add or update an object's modifier\nkeyframes: Insert many animation keys on object or object-data properties\nframe: Set/evaluate scene frame or animation range\nproperties: Set RNA properties on object, its data, scene or render settings\nrna: Discover Blender RNA properties/enums for a type, bounded and filterable\nrender: Render still or animation using current scene settings and resolution; blocking"
+            }
+          ],
+          "isError": false
+        }
+      },
+      {
+        "case": "discovery repair",
+        "name": "discover",
+        "arguments": {
+          "operation": [
+            "primitive",
+            "array"
+          ]
+        },
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "primitive [write]: Create a mesh\nname: unique string\nkind: cube|sphere|plane|cylinder|cone\nlocation?: [x,y,z], default [0,0,0]\nscale?: [x,y,z], default [1,1,1]\narray [write]: Create linked copies along an offset in ONE operation\nname: source\ncount: 1..200 copies, excludes source\noffset: [x,y,z] step\nprefix: unique copy prefix"
+            }
+          ],
+          "isError": false
+        }
+      }
+    ],
+    "measurements": {
+      "cl100k_base": {
+        "arguments": 241,
+        "results": 421,
+        "warm_payload": 662,
+        "discovery_error_and_repair": 322,
+        "schema_and_instructions": 525
+      },
+      "o200k_base": {
+        "arguments": 248,
+        "results": 420,
+        "warm_payload": 668,
+        "discovery_error_and_repair": 323,
+        "schema_and_instructions": 536
+      }
+    },
+    "outcomes_verified": true
+  }
+}

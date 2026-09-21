@@ -4,10 +4,6 @@ Python is intentionally unrestricted, explicitly enabled, and always runs on the
 Blender main thread. It is not covered by the narrower write/save/delete toggles.
 """
 
-import contextlib
-import io
-import json
-
 import bpy
 
 
@@ -15,9 +11,10 @@ OPERATIONS = {
     "python": {
         "summary": "Full bpy/Python API: nodes, rigs, simulation, files, operators; unrestricted local code",
         "args": {
-            "code": "Python source; bpy, params, output_dir provided; assign result for JSON return",
+            "code": "module-level Python; code/script exclusive; bpy, params, output_dir provided; assign result only if needed, no top-level return",
+            "script": "handle from an earlier call; session cache: 64 snippets/1 MiB source; never auto-retry",
             "params": "optional JSON object",
-            "max_output": "0..32000 characters, default 2000",
+            "max_output": "0..32000 combined stdout/result characters, default 2000; batch cap 32 KiB UTF-8",
         },
     },
     "modifier": {
@@ -70,22 +67,11 @@ OPERATIONS = {
 def validate(op, s):
     if op not in OPERATIONS:
         return False
-    required = {
-        "python": ("code",),
-        "modifier": ("name", "modifier"),
-        "keyframes": ("name", "data_path", "keys"),
-        "frame": (),
-        "properties": ("values",),
-        "rna": ("type",),
-        "render": ("filename",),
-    }
-    for key in required[op]:
-        if key not in s:
-            raise ValueError(f"{op} needs {key}")
     if op == "python":
-        if not isinstance(s["code"], str):
-            raise ValueError("code must be a string")
-        compile(s["code"], "<astra-mcp>", "exec")
+        if ("code" in s) == ("script" in s):
+            raise ValueError("Exactly one of code/script is required")
+        if not isinstance(s.get("code", s.get("script")), str):
+            raise ValueError("code/script must be a string")
         if not isinstance(s.get("params", {}), dict):
             raise ValueError("params must be an object")
         if type(s.get("max_output", 2000)) is not int or not 0 <= s.get("max_output", 2000) <= 32000:
@@ -122,18 +108,6 @@ def validate(op, s):
     return True
 
 
-class BoundedOutput(io.TextIOBase):
-    def __init__(self, limit):
-        self.limit = limit
-        self.text = ""
-        self.total = 0
-
-    def write(self, text):
-        self.total += len(text)
-        self.text += text[: max(0, self.limit - len(self.text))]
-        return len(text)
-
-
 def set_path(target, path, value):
     # RNA resolves collection lookups without evaluating Python expressions.
     parent, _, attribute = path.rpartition(".")
@@ -149,27 +123,6 @@ def run(engine, s):
     op = s["op"]
     if op not in OPERATIONS:
         return None
-    if op == "python":
-        limit = s.get("max_output", 2000)
-        capture = BoundedOutput(limit)
-        namespace = {"bpy": bpy, "params": s.get("params", {}), "output_dir": str(engine.output_dir)}
-        with contextlib.redirect_stdout(capture), contextlib.redirect_stderr(capture):
-            exec(compile(s["code"], "<astra-mcp>", "exec"), namespace)
-        value = namespace.get("result")
-        # Reject non-JSON results explicitly, rather than leaking opaque bpy representations.
-        encoded = json.dumps(value, ensure_ascii=False, allow_nan=False, separators=(",", ":"))
-        response = {}
-        if "result" in namespace:
-            if len(encoded) > limit:
-                response.update(
-                    result_preview=encoded[:limit], result_truncated=True, result_chars=len(encoded)
-                )
-            else:
-                response["value"] = value
-        if capture.total:
-            response.update(stdout=capture.text, stdout_truncated=capture.total > limit)
-        # Python may mutate anything; never invent an object-change count.
-        return {"result": response}
     if op == "modifier":
         obj = owned(s["name"])
         mod = obj.modifiers.get(s["modifier"])

@@ -64,7 +64,7 @@ CATALOG = {
         },
     },
     "delete": {
-        "summary": "Delete managed objects only; requires delete permission AND confirm",
+        "summary": "Delete active-scene objects; requires delete permission AND confirm",
         "args": {"names": "list of up to 200 managed names", "confirm": "true"},
     },
     "save": {
@@ -74,6 +74,24 @@ CATALOG = {
 }
 
 CATALOG.update(OPERATIONS)
+REQUIRED = {
+    "primitive": ("name", "kind"),
+    "transform": ("name",),
+    "material": ("name", "color"),
+    "assign_material": ("name", "material"),
+    "array": ("name", "count", "offset", "prefix"),
+    "light": ("name", "location", "energy"),
+    "camera": ("name", "location", "target"),
+    "delete": ("names", "confirm"),
+    "save": ("filename",),
+    "python": (),
+    "modifier": ("name", "modifier"),
+    "keyframes": ("name", "data_path", "keys"),
+    "frame": (),
+    "properties": ("values",),
+    "rna": ("type",),
+    "render": ("filename",),
+}
 for entry in CATALOG.values():
     entry["summary"] = entry["summary"].replace("managed ", "")
     entry["args"] = {k: v.replace("managed ", "") for k, v in entry["args"].items()}
@@ -82,11 +100,20 @@ PERMISSIONS = {
     name: ("delete" if name == "delete" else "save" if name == "save" else "write") for name in CATALOG
 }
 PERMISSIONS.update(python="python", render="render", rna=None)
+for operation, entry in CATALOG.items():
+    entry["required"] = REQUIRED[operation]
+    entry["permission"] = PERMISSIONS[operation]
 
 
 def discover(operation=None):
     if operation is None:
         return {name: entry["summary"] for name, entry in CATALOG.items()}
-    if operation not in CATALOG:
-        raise ValueError(f"Unknown operation: {operation}")
+    if isinstance(operation, list):
+        if not 1 <= len(operation) <= 16 or any(
+            not isinstance(v, str) or v not in CATALOG for v in operation
+        ):
+            raise ValueError("operation must contain 1..16 known names; omit operation to list names")
+        return {key: CATALOG[key] for key in operation}
+    if not isinstance(operation, str) or operation not in CATALOG:
+        raise ValueError(f"Unknown operation: {operation}; omit operation to list names")
     return CATALOG[operation]

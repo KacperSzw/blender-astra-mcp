@@ -1,0 +1,958 @@
+{
+  "setup": [
+    {
+      "op": "primitive",
+      "kind": "cube",
+      "name": "BenchSeed"
+    },
+    {
+      "op": "array",
+      "name": "BenchSeed",
+      "count": 49,
+      "offset": [
+        1,
+        0,
+        0
+      ],
+      "prefix": "Bench"
+    }
+  ],
+  "scenarios": {
+    "cold_edit": [
+      {
+        "name": "discover",
+        "arguments": {
+          "operation": "transform"
+        },
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "transform [write]: Transform one object\nname: existing name\nlocation?: optional [x,y,z]\nrotation?: optional Euler radians [x,y,z]\nscale?: optional [x,y,z]"
+            }
+          ],
+          "isError": false
+        }
+      },
+      {
+        "name": "execute",
+        "arguments": {
+          "steps": [
+            {
+              "op": "transform",
+              "name": "BenchSeed",
+              "location": [
+                1,
+                2,
+                3
+              ]
+            }
+          ]
+        },
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "ok completed=1 changed=1"
+            }
+          ],
+          "isError": false
+        }
+      }
+    ],
+    "transforms": [
+      {
+        "name": "execute",
+        "arguments": {
+          "steps": [
+            {
+              "op": "transform",
+              "name": "BenchSeed",
+              "location": [
+                0,
+                3,
+                1
+              ]
+            },
+            {
+              "op": "transform",
+              "name": "Bench_001",
+              "location": [
+                1,
+                3,
+                1
+              ]
+            },
+            {
+              "op": "transform",
+              "name": "Bench_002",
+              "location": [
+                2,
+                3,
+                1
+              ]
+            },
+            {
+              "op": "transform",
+              "name": "Bench_003",
+              "location": [
+                3,
+                3,
+                1
+              ]
+            },
+            {
+              "op": "transform",
+              "name": "Bench_004",
+              "location": [
+                4,
+                3,
+                1
+              ]
+            },
+            {
+              "op": "transform",
+              "name": "Bench_005",
+              "location": [
+                5,
+                3,
+                1
+              ]
+            },
+            {
+              "op": "transform",
+              "name": "Bench_006",
+              "location": [
+                6,
+                3,
+                1
+              ]
+            },
+            {
+              "op": "transform",
+              "name": "Bench_007",
+              "location": [
+                7,
+                3,
+                1
+              ]
+            },
+            {
+              "op": "transform",
+              "name": "Bench_008",
+              "location": [
+                8,
+                3,
+                1
+              ]
+            },
+            {
+              "op": "transform",
+              "name": "Bench_009",
+              "location": [
+                9,
+                3,
+                1
+              ]
+            },
+            {
+              "op": "transform",
+              "name": "Bench_010",
+              "location": [
+                10,
+                3,
+                1
+              ]
+            },
+            {
+              "op": "transform",
+              "name": "Bench_011",
+              "location": [
+                11,
+                3,
+                1
+              ]
+            },
+            {
+              "op": "transform",
+              "name": "Bench_012",
+              "location": [
+                12,
+                3,
+                1
+              ]
+            },
+            {
+              "op": "transform",
+              "name": "Bench_013",
+              "location": [
+                13,
+                3,
+                1
+              ]
+            },
+            {
+              "op": "transform",
+              "name": "Bench_014",
+              "location": [
+                14,
+                3,
+                1
+              ]
+            },
+            {
+              "op": "transform",
+              "name": "Bench_015",
+              "location": [
+                15,
+                3,
+                1
+              ]
+            },
+            {
+              "op": "transform",
+              "name": "Bench_016",
+              "location": [
+                16,
+                3,
+                1
+              ]
+            },
+            {
+              "op": "transform",
+              "name": "Bench_017",
+              "location": [
+                17,
+                3,
+                1
+              ]
+            },
+            {
+              "op": "transform",
+              "name": "Bench_018",
+              "location": [
+                18,
+                3,
+                1
+              ]
+            },
+            {
+              "op": "transform",
+              "name": "Bench_019",
+              "location": [
+                19,
+                3,
+                1
+              ]
+            },
+            {
+              "op": "transform",
+              "name": "Bench_020",
+              "location": [
+                20,
+                3,
+                1
+              ]
+            },
+            {
+              "op": "transform",
+              "name": "Bench_021",
+              "location": [
+                21,
+                3,
+                1
+              ]
+            },
+            {
+              "op": "transform",
+              "name": "Bench_022",
+              "location": [
+                22,
+                3,
+                1
+              ]
+            },
+            {
+              "op": "transform",
+              "name": "Bench_023",
+              "location": [
+                23,
+                3,
+                1
+              ]
+            },
+            {
+              "op": "transform",
+              "name": "Bench_024",
+              "location": [
+                24,
+                3,
+                1
+              ]
+            },
+            {
+              "op": "transform",
+              "name": "Bench_025",
+              "location": [
+                25,
+                3,
+                1
+              ]
+            },
+            {
+              "op": "transform",
+              "name": "Bench_026",
+              "location": [
+                26,
+                3,
+                1
+              ]
+            },
+            {
+              "op": "transform",
+              "name": "Bench_027",
+              "location": [
+                27,
+                3,
+                1
+              ]
+            },
+            {
+              "op": "transform",
+              "name": "Bench_028",
+              "location": [
+                28,
+                3,
+                1
+              ]
+            },
+            {
+              "op": "transform",
+              "name": "Bench_029",
+              "location": [
+                29,
+                3,
+                1
+              ]
+            },
+            {
+              "op": "transform",
+              "name": "Bench_030",
+              "location": [
+                30,
+                3,
+                1
+              ]
+            },
+            {
+              "op": "transform",
+              "name": "Bench_031",
+              "location": [
+                31,
+                3,
+                1
+              ]
+            },
+            {
+              "op": "transform",
+              "name": "Bench_032",
+              "location": [
+                32,
+                3,
+                1
+              ]
+            },
+            {
+              "op": "transform",
+              "name": "Bench_033",
+              "location": [
+                33,
+                3,
+                1
+              ]
+            },
+            {
+              "op": "transform",
+              "name": "Bench_034",
+              "location": [
+                34,
+                3,
+                1
+              ]
+            },
+            {
+              "op": "transform",
+              "name": "Bench_035",
+              "location": [
+                35,
+                3,
+                1
+              ]
+            },
+            {
+              "op": "transform",
+              "name": "Bench_036",
+              "location": [
+                36,
+                3,
+                1
+              ]
+            },
+            {
+              "op": "transform",
+              "name": "Bench_037",
+              "location": [
+                37,
+                3,
+                1
+              ]
+            },
+            {
+              "op": "transform",
+              "name": "Bench_038",
+              "location": [
+                38,
+                3,
+                1
+              ]
+            },
+            {
+              "op": "transform",
+              "name": "Bench_039",
+              "location": [
+                39,
+                3,
+                1
+              ]
+            },
+            {
+              "op": "transform",
+              "name": "Bench_040",
+              "location": [
+                40,
+                3,
+                1
+              ]
+            },
+            {
+              "op": "transform",
+              "name": "Bench_041",
+              "location": [
+                41,
+                3,
+                1
+              ]
+            },
+            {
+              "op": "transform",
+              "name": "Bench_042",
+              "location": [
+                42,
+                3,
+                1
+              ]
+            },
+            {
+              "op": "transform",
+              "name": "Bench_043",
+              "location": [
+                43,
+                3,
+                1
+              ]
+            },
+            {
+              "op": "transform",
+              "name": "Bench_044",
+              "location": [
+                44,
+                3,
+                1
+              ]
+            },
+            {
+              "op": "transform",
+              "name": "Bench_045",
+              "location": [
+                45,
+                3,
+                1
+              ]
+            },
+            {
+              "op": "transform",
+              "name": "Bench_046",
+              "location": [
+                46,
+                3,
+                1
+              ]
+            },
+            {
+              "op": "transform",
+              "name": "Bench_047",
+              "location": [
+                47,
+                3,
+                1
+              ]
+            },
+            {
+              "op": "transform",
+              "name": "Bench_048",
+              "location": [
+                48,
+                3,
+                1
+              ]
+            },
+            {
+              "op": "transform",
+              "name": "Bench_049",
+              "location": [
+                49,
+                3,
+                1
+              ]
+            }
+          ]
+        },
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "ok completed=50 changed=50"
+            }
+          ],
+          "isError": false
+        }
+      }
+    ],
+    "discovery": [
+      {
+        "name": "discover",
+        "arguments": {
+          "operation": [
+            "primitive",
+            "array",
+            "material",
+            "assign_material"
+          ]
+        },
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "primitive [write]: Create a mesh\nname: unique string\nkind: cube|sphere|plane|cylinder|cone\nlocation?: [x,y,z], default [0,0,0]\nscale?: [x,y,z], default [1,1,1]\narray [write]: Create linked copies along an offset in ONE operation\nname: source\ncount: 1..200 copies, excludes source\noffset: [x,y,z] step\nprefix: unique copy prefix\nmaterial [write]: Create/update a Principled material\nname: material name\ncolor: RGBA [0..1]\nmetallic?: 0..1 default 0\nroughness?: 0..1 default 0.5\nassign_material [write]: Replace a mesh's material slots\nname: mesh name\nmaterial: material name"
+            }
+          ],
+          "isError": false
+        }
+      }
+    ],
+    "inspection": [
+      {
+        "name": "inspect",
+        "arguments": {
+          "names": [
+            "BenchSeed",
+            "Bench_049"
+          ],
+          "fields": [
+            "location"
+          ]
+        },
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "scene=\"Scene\" total=2 blender=5.1.1 permissions=delete,python,render,save,write\nname\tlocation\n\"BenchSeed\"\t[0,3,1]\n\"Bench_049\"\t[49,3,1]\nreturned=2"
+            }
+          ],
+          "isError": false
+        }
+      }
+    ],
+    "snippets": [
+      {
+        "name": "discover",
+        "arguments": {
+          "operation": "python"
+        },
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "python [python]: Full bpy/Python API: nodes, rigs, simulation, files, operators; unrestricted local code\ncode?: Python source; exactly one of code/script; bpy, params, output_dir provided; assign result\nscript?: handle from an earlier call; session cache: 64 snippets/1 MiB source; never auto-retry\nparams?: optional JSON object\nmax_output?: 0..32000 combined stdout/result characters, default 2000; batch cap 32 KiB UTF-8"
+            }
+          ],
+          "isError": false
+        }
+      },
+      {
+        "name": "execute",
+        "arguments": {
+          "steps": [
+            {
+              "op": "python",
+              "code": "for name in params[\"names\"]:\n    obj=bpy.data.objects[name]\n    obj.location.z=params[\"z\"]\n    obj.hide_render=False\n    obj[\"benchmark\"]=True\nresult={\"updated\":len(params[\"names\"])}",
+              "params": {
+                "names": [
+                  "BenchSeed",
+                  "Bench_049"
+                ],
+                "z": 1
+              }
+            }
+          ]
+        },
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "ok completed=1 changed=unknown\nstep=0 script=39240c4c00001ed0:1\nstep=0 {\"value\":{\"updated\":2}}"
+            }
+          ],
+          "isError": false
+        }
+      },
+      {
+        "name": "execute",
+        "arguments": {
+          "steps": [
+            {
+              "op": "python",
+              "params": {
+                "names": [
+                  "BenchSeed",
+                  "Bench_049"
+                ],
+                "z": 2
+              },
+              "script": "39240c4c00001ed0:1"
+            }
+          ]
+        },
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "ok completed=1 changed=unknown\nstep=0 script=39240c4c00001ed0:1\nstep=0 {\"value\":{\"updated\":2}}"
+            }
+          ],
+          "isError": false
+        }
+      },
+      {
+        "name": "execute",
+        "arguments": {
+          "steps": [
+            {
+              "op": "python",
+              "params": {
+                "names": [
+                  "BenchSeed",
+                  "Bench_049"
+                ],
+                "z": 3
+              },
+              "script": "39240c4c00001ed0:1"
+            }
+          ]
+        },
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "ok completed=1 changed=unknown\nstep=0 script=39240c4c00001ed0:1\nstep=0 {\"value\":{\"updated\":2}}"
+            }
+          ],
+          "isError": false
+        }
+      },
+      {
+        "name": "execute",
+        "arguments": {
+          "steps": [
+            {
+              "op": "python",
+              "params": {
+                "names": [
+                  "BenchSeed",
+                  "Bench_049"
+                ],
+                "z": 4
+              },
+              "script": "39240c4c00001ed0:1"
+            }
+          ]
+        },
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "ok completed=1 changed=unknown\nstep=0 script=39240c4c00001ed0:1\nstep=0 {\"value\":{\"updated\":2}}"
+            }
+          ],
+          "isError": false
+        }
+      },
+      {
+        "name": "execute",
+        "arguments": {
+          "steps": [
+            {
+              "op": "python",
+              "params": {
+                "names": [
+                  "BenchSeed",
+                  "Bench_049"
+                ],
+                "z": 5
+              },
+              "script": "39240c4c00001ed0:1"
+            }
+          ]
+        },
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "ok completed=1 changed=unknown\nstep=0 script=39240c4c00001ed0:1\nstep=0 {\"value\":{\"updated\":2}}"
+            }
+          ],
+          "isError": false
+        }
+      },
+      {
+        "name": "execute",
+        "arguments": {
+          "steps": [
+            {
+              "op": "python",
+              "params": {
+                "names": [
+                  "BenchSeed",
+                  "Bench_049"
+                ],
+                "z": 6
+              },
+              "script": "39240c4c00001ed0:1"
+            }
+          ]
+        },
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "ok completed=1 changed=unknown\nstep=0 script=39240c4c00001ed0:1\nstep=0 {\"value\":{\"updated\":2}}"
+            }
+          ],
+          "isError": false
+        }
+      },
+      {
+        "name": "execute",
+        "arguments": {
+          "steps": [
+            {
+              "op": "python",
+              "params": {
+                "names": [
+                  "BenchSeed",
+                  "Bench_049"
+                ],
+                "z": 7
+              },
+              "script": "39240c4c00001ed0:1"
+            }
+          ]
+        },
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "ok completed=1 changed=unknown\nstep=0 script=39240c4c00001ed0:1\nstep=0 {\"value\":{\"updated\":2}}"
+            }
+          ],
+          "isError": false
+        }
+      },
+      {
+        "name": "execute",
+        "arguments": {
+          "steps": [
+            {
+              "op": "python",
+              "params": {
+                "names": [
+                  "BenchSeed",
+                  "Bench_049"
+                ],
+                "z": 8
+              },
+              "script": "39240c4c00001ed0:1"
+            }
+          ]
+        },
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "ok completed=1 changed=unknown\nstep=0 script=39240c4c00001ed0:1\nstep=0 {\"value\":{\"updated\":2}}"
+            }
+          ],
+          "isError": false
+        }
+      }
+    ],
+    "recovery": [
+      {
+        "name": "execute",
+        "arguments": {
+          "steps": [
+            {
+              "op": "transform",
+              "name": "BenchSeed",
+              "location": [
+                1,
+                2,
+                3
+              ]
+            },
+            {
+              "op": "transform",
+              "name": "Missing",
+              "location": [
+                0,
+                0,
+                0
+              ]
+            }
+          ]
+        },
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "error failed_index=1 completed=1 changed=1 partial=true\n\"Object not found: Missing\"\nEarlier operations persist; failed operation may have partial effects."
+            }
+          ],
+          "isError": true
+        }
+      },
+      {
+        "name": "inspect",
+        "arguments": {
+          "names": [
+            "BenchSeed"
+          ]
+        },
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "scene=\"Scene\" total=1 blender=5.1.1 permissions=delete,python,render,save,write\nname\ttype\tmanaged\tlocation\tscale\trotation\tvertices\tpolygons\tmaterials\n\"BenchSeed\"\t\"MESH\"\ttrue\t[1,2,3]\t[1,1,1]\t[0,0,0]\t8\t6\t[]\nreturned=1"
+            }
+          ],
+          "isError": false
+        }
+      }
+    ],
+    "cold_code": [
+      {
+        "name": "discover",
+        "arguments": {
+          "operation": "python"
+        },
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "python [python]: Full bpy/Python API: nodes, rigs, simulation, files, operators; unrestricted local code\ncode?: Python source; exactly one of code/script; bpy, params, output_dir provided; assign result\nscript?: handle from an earlier call; session cache: 64 snippets/1 MiB source; never auto-retry\nparams?: optional JSON object\nmax_output?: 0..32000 combined stdout/result characters, default 2000; batch cap 32 KiB UTF-8"
+            }
+          ],
+          "isError": false
+        }
+      },
+      {
+        "name": "execute",
+        "arguments": {
+          "steps": [
+            {
+              "op": "python",
+              "code": "for name in params[\"names\"]:\n    obj=bpy.data.objects[name]\n    obj.location.z=params[\"z\"]\n    obj.hide_render=False\n    obj[\"benchmark\"]=True\nresult={\"updated\":len(params[\"names\"])}",
+              "params": {
+                "names": [
+                  "BenchSeed",
+                  "Bench_049"
+                ],
+                "z": 1
+              }
+            }
+          ]
+        },
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "ok completed=1 changed=unknown\nstep=0 script=39240c4c00001ed0:1\nstep=0 {\"value\":{\"updated\":2}}"
+            }
+          ],
+          "isError": false
+        }
+      }
+    ],
+    "known_code": [
+      {
+        "name": "execute",
+        "arguments": {
+          "steps": [
+            {
+              "op": "python",
+              "code": "for name in params[\"names\"]:\n    obj=bpy.data.objects[name]\n    obj.location.z=params[\"z\"]\n    obj.hide_render=False\n    obj[\"benchmark\"]=True\nresult={\"updated\":len(params[\"names\"])}",
+              "params": {
+                "names": [
+                  "BenchSeed",
+                  "Bench_049"
+                ],
+                "z": 1
+              }
+            }
+          ]
+        },
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "ok completed=1 changed=unknown\nstep=0 script=39240c4c00001ed0:1\nstep=0 {\"value\":{\"updated\":2}}"
+            }
+          ],
+          "isError": false
+        }
+      }
+    ],
+    "uniform_records": [
+      {
+        "name": "execute",
+        "arguments": {
+          "steps": [
+            {
+              "op": "python",
+              "code": "result=[{'name':o.name,'vertices':len(o.data.vertices),'visible':not o.hide_render} for o in sorted(bpy.context.scene.objects,key=lambda o:o.name) if o.type=='MESH'][:20]"
+            }
+          ]
+        },
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "ok completed=1 changed=unknown\nstep=0 script=efba242647542204:1\nstep=0 {\"value\":[{\"name\":\"BenchSeed\",\"vertices\":8,\"visible\":true},{\"name\":\"Bench_001\",\"vertices\":8,\"visible\":true},{\"name\":\"Bench_002\",\"vertices\":8,\"visible\":true},{\"name\":\"Bench_003\",\"vertices\":8,\"visible\":true},{\"name\":\"Bench_004\",\"vertices\":8,\"visible\":true},{\"name\":\"Bench_005\",\"vertices\":8,\"visible\":true},{\"name\":\"Bench_006\",\"vertices\":8,\"visible\":true},{\"name\":\"Bench_007\",\"vertices\":8,\"visible\":true},{\"name\":\"Bench_008\",\"vertices\":8,\"visible\":true},{\"name\":\"Bench_009\",\"vertices\":8,\"visible\":true},{\"name\":\"Bench_010\",\"vertices\":8,\"visible\":true},{\"name\":\"Bench_011\",\"vertices\":8,\"visible\":true},{\"name\":\"Bench_012\",\"vertices\":8,\"visible\":true},{\"name\":\"Bench_013\",\"vertices\":8,\"visible\":true},{\"name\":\"Bench_014\",\"vertices\":8,\"visible\":true},{\"name\":\"Bench_015\",\"vertices\":8,\"visible\":true},{\"name\":\"Bench_016\",\"vertices\":8,\"visible\":true},{\"name\":\"Bench_017\",\"vertices\":8,\"visible\":true},{\"name\":\"Bench_018\",\"vertices\":8,\"visible\":true},{\"name\":\"Bench_019\",\"vertices\":8,\"visible\":true}]}"
+            }
+          ],
+          "isError": false
+        }
+      }
+    ]
+  }
+}

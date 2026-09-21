@@ -10,3 +10,6 @@ artifacts/
 connection*.json
 .env
 .DS_Store
+target/
+result
+result-*

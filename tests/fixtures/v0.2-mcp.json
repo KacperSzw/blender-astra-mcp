@@ -1,0 +1,153 @@
+{
+  "source_commit": "90a1f24",
+  "instructions": "Discover an operation before use. Batch related edits. Inspect narrowly; capture only when visual feedback is needed. Existing scenes are editable. Discover python for full bpy access (must be enabled in Blender). Partial batch failures persist; inspect before retrying.",
+  "tools": [
+    {
+      "name": "inspect",
+      "description": "Read a bounded scene summary; pass names for detailed object properties.",
+      "inputSchema": {
+        "properties": {
+          "names": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Names"
+          },
+          "limit": {
+            "default": 20,
+            "title": "Limit",
+            "type": "integer"
+          },
+          "offset": {
+            "default": 0,
+            "title": "Offset",
+            "type": "integer"
+          }
+        },
+        "title": "inspectArguments",
+        "type": "object"
+      },
+      "outputSchema": {
+        "properties": {
+          "result": {
+            "title": "Result",
+            "type": "string"
+          }
+        },
+        "required": [
+          "result"
+        ],
+        "title": "inspectOutput",
+        "type": "object"
+      }
+    },
+    {
+      "name": "discover",
+      "description": "List operation summaries, or fetch one operation's arguments.",
+      "inputSchema": {
+        "properties": {
+          "operation": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Operation"
+          }
+        },
+        "title": "discoverArguments",
+        "type": "object"
+      },
+      "outputSchema": {
+        "properties": {
+          "result": {
+            "title": "Result",
+            "type": "string"
+          }
+        },
+        "required": [
+          "result"
+        ],
+        "title": "discoverOutput",
+        "type": "object"
+      }
+    },
+    {
+      "name": "execute",
+      "description": "Execute up to 100 {'op': name, ...arguments} steps. Returns counts/errors, not full scene data.\n\ndry_run checks syntax/permissions only. Runtime failures are partial, not transactional.\n",
+      "inputSchema": {
+        "properties": {
+          "steps": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Steps",
+            "type": "array"
+          },
+          "dry_run": {
+            "default": false,
+            "title": "Dry Run",
+            "type": "boolean"
+          },
+          "timeout": {
+            "default": 180,
+            "title": "Timeout",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "steps"
+        ],
+        "title": "executeArguments",
+        "type": "object"
+      },
+      "outputSchema": {
+        "properties": {
+          "result": {
+            "title": "Result",
+            "type": "string"
+          }
+        },
+        "required": [
+          "result"
+        ],
+        "title": "executeOutput",
+        "type": "object"
+      }
+    },
+    {
+      "name": "capture",
+      "description": "PNG preview (64..1024): camera render or viewport (requires interactive 3D View).",
+      "inputSchema": {
+        "properties": {
+          "size": {
+            "default": 512,
+            "title": "Size",
+            "type": "integer"
+          },
+          "view": {
+            "default": "camera",
+            "title": "View",
+            "type": "string"
+          }
+        },
+        "title": "captureArguments",
+        "type": "object"
+      }
+    }
+  ]
+}

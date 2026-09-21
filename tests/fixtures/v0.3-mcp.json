@@ -1,0 +1,147 @@
+{
+  "instructions": "Inspect narrowly. Discover unfamiliar operations; batch related work. Python is unrestricted. Failed batches persist; timeouts do not cancel work. Inspect before retrying.",
+  "tools": [
+    {
+      "name": "inspect",
+      "description": "Read scene objects: names selects exact names; match selects a case-sensitive glob. fields projects properties.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "names": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 100
+          },
+          "match": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "fields": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "type": "string"
+            },
+            "description": "name,type,managed,location,rotation,scale,vertices,polygons,materials"
+          },
+          "limit": {
+            "type": "integer",
+            "default": 20,
+            "minimum": 1,
+            "maximum": 100
+          },
+          "offset": {
+            "type": "integer",
+            "default": 0,
+            "minimum": 0
+          }
+        },
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "discover",
+      "description": "List operations, or fetch contracts for one name or a list. ? marks optional fields.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "operation": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "minItems": 1,
+                "maxItems": 16
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "execute",
+      "description": "Batch {op,...args} steps. dry_run validates syntax/permissions only; runtime failures are partial.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "steps": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            },
+            "minItems": 1,
+            "maxItems": 100
+          },
+          "dry_run": {
+            "type": "boolean",
+            "default": false
+          },
+          "timeout": {
+            "type": "integer",
+            "default": 180,
+            "minimum": 1,
+            "maximum": 86400
+          }
+        },
+        "required": [
+          "steps"
+        ],
+        "additionalProperties": false
+      }
+    },
+    {
+      "name": "capture",
+      "description": "PNG preview: camera render or interactive viewport.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "size": {
+            "type": "integer",
+            "default": 512,
+            "minimum": 64,
+            "maximum": 1024
+          },
+          "view": {
+            "type": "string",
+            "enum": [
+              "camera",
+              "viewport"
+            ],
+            "default": "camera"
+          }
+        },
+        "additionalProperties": false
+      },
+      "annotations": {
+        "destructiveHint": false,
+        "openWorldHint": false
+      }
+    }
+  ]
+}

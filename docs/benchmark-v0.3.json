@@ -1,0 +1,314 @@
+{
+  "baseline_commit": "90a1f24",
+  "version": "0.3.0",
+  "blender": "5.1.1",
+  "method": "Recorded v0.2 MCP transcripts versus actual v0.3 stdio calls; same isolated factory scene and verified task outcomes",
+  "definitions": {
+    "cold_text_payload": "instructions + tools/list schemas + arguments + content text; each counted separately",
+    "warm_text_payload": "arguments + content text; excludes startup context",
+    "normalized_mcp_wire": "JSON-RPC calls/results normalized with serde_json and fixed request ID; includes structuredContent and envelopes"
+  },
+  "excluded": [
+    "provider-specific tool loading",
+    "conversation/reasoning",
+    "cached-token billing",
+    "images",
+    "scene setup"
+  ],
+  "limitation": "Offline tokenizer measurements, not provider usage or billed savings. Clients may expose one or both legacy result copies.",
+  "equivalent_task_outcomes": true,
+  "encodings": {
+    "cl100k_base": {
+      "cold_edit": {
+        "v0.2": {
+          "calls": 2,
+          "schemas": 429,
+          "instructions": 50,
+          "arguments": 27,
+          "text_results": 59,
+          "warm_text_payload": 86,
+          "cold_text_payload": 565,
+          "normalized_mcp_wire": 269,
+          "envelopes_and_structured_content": 183
+        },
+        "v0.3": {
+          "calls": 2,
+          "schemas": 418,
+          "instructions": 31,
+          "arguments": 27,
+          "text_results": 46,
+          "warm_text_payload": 73,
+          "cold_text_payload": 522,
+          "normalized_mcp_wire": 185,
+          "envelopes_and_structured_content": 112
+        }
+      },
+      "transforms": {
+        "v0.2": {
+          "calls": 1,
+          "schemas": 429,
+          "instructions": 50,
+          "arguments": 1002,
+          "text_results": 16,
+          "warm_text_payload": 1018,
+          "cold_text_payload": 1497,
+          "normalized_mcp_wire": 1095,
+          "envelopes_and_structured_content": 77
+        },
+        "v0.3": {
+          "calls": 1,
+          "schemas": 418,
+          "instructions": 31,
+          "arguments": 1002,
+          "text_results": 7,
+          "warm_text_payload": 1009,
+          "cold_text_payload": 1458,
+          "normalized_mcp_wire": 1064,
+          "envelopes_and_structured_content": 55
+        }
+      },
+      "discovery": {
+        "v0.2": {
+          "calls": 4,
+          "schemas": 429,
+          "instructions": 50,
+          "arguments": 21,
+          "text_results": 173,
+          "warm_text_payload": 194,
+          "cold_text_payload": 673,
+          "normalized_mcp_wire": 619,
+          "envelopes_and_structured_content": 425
+        },
+        "v0.3": {
+          "calls": 1,
+          "schemas": 418,
+          "instructions": 31,
+          "arguments": 12,
+          "text_results": 169,
+          "warm_text_payload": 181,
+          "cold_text_payload": 630,
+          "normalized_mcp_wire": 241,
+          "envelopes_and_structured_content": 60
+        }
+      },
+      "inspection": {
+        "v0.2": {
+          "calls": 1,
+          "schemas": 429,
+          "instructions": 50,
+          "arguments": 12,
+          "text_results": 178,
+          "warm_text_payload": 190,
+          "cold_text_payload": 669,
+          "normalized_mcp_wire": 469,
+          "envelopes_and_structured_content": 279
+        },
+        "v0.3": {
+          "calls": 1,
+          "schemas": 418,
+          "instructions": 31,
+          "arguments": 16,
+          "text_results": 57,
+          "warm_text_payload": 73,
+          "cold_text_payload": 522,
+          "normalized_mcp_wire": 133,
+          "envelopes_and_structured_content": 60
+        }
+      },
+      "snippets": {
+        "v0.2": {
+          "calls": 9,
+          "schemas": 429,
+          "instructions": 50,
+          "arguments": 685,
+          "text_results": 312,
+          "warm_text_payload": 997,
+          "cold_text_payload": 1476,
+          "normalized_mcp_wire": 1924,
+          "envelopes_and_structured_content": 927
+        },
+        "v0.3": {
+          "calls": 9,
+          "schemas": 418,
+          "instructions": 31,
+          "arguments": 363,
+          "text_results": 384,
+          "warm_text_payload": 747,
+          "cold_text_payload": 1196,
+          "normalized_mcp_wire": 1251,
+          "envelopes_and_structured_content": 504
+        }
+      },
+      "recovery": {
+        "v0.2": {
+          "calls": 2,
+          "schemas": 429,
+          "instructions": 50,
+          "arguments": 46,
+          "text_results": 151,
+          "warm_text_payload": 197,
+          "cold_text_payload": 676,
+          "normalized_mcp_wire": 496,
+          "envelopes_and_structured_content": 299
+        },
+        "v0.3": {
+          "calls": 2,
+          "schemas": 418,
+          "instructions": 31,
+          "arguments": 46,
+          "text_results": 116,
+          "warm_text_payload": 162,
+          "cold_text_payload": 611,
+          "normalized_mcp_wire": 283,
+          "envelopes_and_structured_content": 121
+        }
+      }
+    },
+    "o200k_base": {
+      "cold_edit": {
+        "v0.2": {
+          "calls": 2,
+          "schemas": 443,
+          "instructions": 49,
+          "arguments": 27,
+          "text_results": 59,
+          "warm_text_payload": 86,
+          "cold_text_payload": 578,
+          "normalized_mcp_wire": 274,
+          "envelopes_and_structured_content": 188
+        },
+        "v0.3": {
+          "calls": 2,
+          "schemas": 430,
+          "instructions": 31,
+          "arguments": 27,
+          "text_results": 46,
+          "warm_text_payload": 73,
+          "cold_text_payload": 534,
+          "normalized_mcp_wire": 188,
+          "envelopes_and_structured_content": 115
+        }
+      },
+      "transforms": {
+        "v0.2": {
+          "calls": 1,
+          "schemas": 443,
+          "instructions": 49,
+          "arguments": 953,
+          "text_results": 16,
+          "warm_text_payload": 969,
+          "cold_text_payload": 1461,
+          "normalized_mcp_wire": 1049,
+          "envelopes_and_structured_content": 80
+        },
+        "v0.3": {
+          "calls": 1,
+          "schemas": 430,
+          "instructions": 31,
+          "arguments": 953,
+          "text_results": 7,
+          "warm_text_payload": 960,
+          "cold_text_payload": 1421,
+          "normalized_mcp_wire": 1017,
+          "envelopes_and_structured_content": 57
+        }
+      },
+      "discovery": {
+        "v0.2": {
+          "calls": 4,
+          "schemas": 443,
+          "instructions": 49,
+          "arguments": 21,
+          "text_results": 173,
+          "warm_text_payload": 194,
+          "cold_text_payload": 686,
+          "normalized_mcp_wire": 627,
+          "envelopes_and_structured_content": 433
+        },
+        "v0.3": {
+          "calls": 1,
+          "schemas": 430,
+          "instructions": 31,
+          "arguments": 13,
+          "text_results": 170,
+          "warm_text_payload": 183,
+          "cold_text_payload": 644,
+          "normalized_mcp_wire": 243,
+          "envelopes_and_structured_content": 60
+        }
+      },
+      "inspection": {
+        "v0.2": {
+          "calls": 1,
+          "schemas": 443,
+          "instructions": 49,
+          "arguments": 11,
+          "text_results": 177,
+          "warm_text_payload": 188,
+          "cold_text_payload": 680,
+          "normalized_mcp_wire": 466,
+          "envelopes_and_structured_content": 278
+        },
+        "v0.3": {
+          "calls": 1,
+          "schemas": 430,
+          "instructions": 31,
+          "arguments": 16,
+          "text_results": 57,
+          "warm_text_payload": 73,
+          "cold_text_payload": 534,
+          "normalized_mcp_wire": 132,
+          "envelopes_and_structured_content": 59
+        }
+      },
+      "snippets": {
+        "v0.2": {
+          "calls": 9,
+          "schemas": 443,
+          "instructions": 49,
+          "arguments": 685,
+          "text_results": 328,
+          "warm_text_payload": 1013,
+          "cold_text_payload": 1505,
+          "normalized_mcp_wire": 1950,
+          "envelopes_and_structured_content": 937
+        },
+        "v0.3": {
+          "calls": 9,
+          "schemas": 430,
+          "instructions": 31,
+          "arguments": 363,
+          "text_results": 384,
+          "warm_text_payload": 747,
+          "cold_text_payload": 1208,
+          "normalized_mcp_wire": 1267,
+          "envelopes_and_structured_content": 520
+        }
+      },
+      "recovery": {
+        "v0.2": {
+          "calls": 2,
+          "schemas": 443,
+          "instructions": 49,
+          "arguments": 46,
+          "text_results": 152,
+          "warm_text_payload": 198,
+          "cold_text_payload": 690,
+          "normalized_mcp_wire": 499,
+          "envelopes_and_structured_content": 301
+        },
+        "v0.3": {
+          "calls": 2,
+          "schemas": 430,
+          "instructions": 31,
+          "arguments": 46,
+          "text_results": 116,
+          "warm_text_payload": 162,
+          "cold_text_payload": 623,
+          "normalized_mcp_wire": 285,
+          "envelopes_and_structured_content": 123
+        }
+      }
+    }
+  }
+}

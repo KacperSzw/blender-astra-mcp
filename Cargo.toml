@@ -1,0 +1,30 @@
+[package]
+name = "blender-compact-mcp"
+version = "0.4.0"
+edition = "2024"
+rust-version = "1.88"
+description = "Four-tool Blender bridge with batched operations and bounded results"
+license = "MIT"
+default-run = "blender-compact-mcp"
+
+[lib]
+name = "compact_mcp"
+
+[dependencies]
+anyhow = "1"
+base64 = "0.22"
+clap = { version = "4", features = ["derive"] }
+rmcp = { version = "=3.4.0", default-features = false, features = ["server", "transport-io"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = { version = "1", features = ["preserve_order", "arbitrary_precision"] }
+tokio = { version = "1", features = ["rt-multi-thread", "macros", "net", "io-util", "time", "fs", "process"] }
+uuid = { version = "1", features = ["v4"] }
+
+[dev-dependencies]
+tempfile = "3"
+tiktoken-rs = "0.12"
+zip = { version = "8", default-features = false, features = ["deflate"] }
+
+[profile.release]
+lto = "thin"
+strip = true

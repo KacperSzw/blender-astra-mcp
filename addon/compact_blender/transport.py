@@ -52,9 +52,14 @@ class Server:
             "pid": os.getpid(),
             "output_dir": str(self.engine.output_dir.resolve()),
         }
-        fd = os.open(self.descriptor, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
-        with os.fdopen(fd, "w", encoding="utf-8") as out:
-            json.dump(info, out)
+        temporary = self.descriptor.with_suffix(f".{secrets.token_hex(4)}.tmp")
+        try:
+            fd = os.open(temporary, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+            with os.fdopen(fd, "w", encoding="utf-8") as out:
+                json.dump(info, out)
+            os.replace(temporary, self.descriptor)
+        finally:
+            temporary.unlink(missing_ok=True)
 
     def handle(self, request):
         if not isinstance(request, dict):

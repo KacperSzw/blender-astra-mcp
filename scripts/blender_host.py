@@ -14,8 +14,9 @@ parser = argparse.ArgumentParser()
 parser.add_argument("--connection", required=True)
 parser.add_argument("--output", required=True)
 parser.add_argument("--stop", required=True)
+parser.add_argument("--addon", default=str(Path(__file__).resolve().parents[1] / "addon"))
 args = parser.parse_args(sys.argv[sys.argv.index("--") + 1 :])
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "addon"))
+sys.path.insert(0, args.addon)
 import compact_blender  # noqa: E402
 from compact_blender.engine import Engine  # noqa: E402
 from compact_blender.transport import Server  # noqa: E402

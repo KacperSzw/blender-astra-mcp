@@ -36,5 +36,16 @@
       };
 
       formatter.${system} = pkgs.nixfmt;
+      devShells.${system}.default = pkgs.mkShell {
+        packages = [
+          pkgs.cargo
+          pkgs.rustc
+          pkgs.rustfmt
+          pkgs.clippy
+          pkgs.ruff
+          pkgs.blender
+          pkgs.zip
+        ];
+      };
     };
 }
